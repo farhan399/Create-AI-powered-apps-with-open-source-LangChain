@@ -1,0 +1,35 @@
+import gradio as gr
+from langchain.prompts import PromptTemplate
+import os
+from langchain_openai import ChatOpenAI
+
+openai_api_key = "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"
+os.environ["OPENAI_API_KEY"] = openai_api_key
+
+# Define the AI model
+llm = ChatOpenAI(
+    model_name="gpt-3.5-turbo",
+    openai_api_key=openai_api_key
+)
+
+def chatbot(Pertanyaan):
+    # Define a template
+    template = """Question: {question}
+    Please provide step-by-step Answer:
+    """
+    # Create a Prompt Template
+    prompt = PromptTemplate(template=template, input_variables=["question"])
+    
+    # Format the prompt
+    formatted_prompt = prompt.format(question=str(Pertanyaan))
+    
+    # Use the ChatOpenAI method to interact with the model
+    response = llm.invoke(formatted_prompt)
+    
+    answer = response.content.strip()
+    
+    return f"Bot's Response:\n{answer}"
+
+# Create a Gradio interface
+demo = gr.Interface(fn=chatbot, inputs="text", outputs="text")
+demo.launch(share=True)
